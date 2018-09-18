@@ -13,16 +13,15 @@ CACHE_DIR=$2
 ENV_DIR=$3
 WORKING_DIR=$(pwd)
 
+TELEGRAF_CONF=$HOME/telegraf.conf
+TELEGRAF_VERSION=1.7.4
+TELEGRAF_FILENAME=telegraf-${TELEGRAF_VERSION}_linux_amd64.tar.gz
+TELEGRAF_URL=https://dl.influxdata.com/telegraf/releases/${TELEGRAF_FILENAME}
+
 # Export user env variable to use in the file
 for KEY in TELEGRAF_CONF; do
   [ -f $ENV_DIR/$KEY ] && export "$KEY=$(cat $ENV_DIR/$KEY)"
 done
-
-if [ $TELEGRAF_CONF ]; then TELEGRAF_CONF=$HOME/$TELEGRAF_CONF; fi
-TELEGRAF_CONF=${TELEGRAF_CONF-$HOME/telegraf.conf}
-TELEGRAF_VERSION=1.7.4
-TELEGRAF_FILENAME=telegraf-${TELEGRAF_VERSION}_linux_amd64.tar.gz
-TELEGRAF_URL=https://dl.influxdata.com/telegraf/releases/${TELEGRAF_FILENAME}
 
 echo "Installing Telegraf ${TELEGRAF_VERSION}" | arrow
 
@@ -45,8 +44,8 @@ cp $CACHE_DIR/telegraf/usr/bin/telegraf $BUILD_DIR/bin/telegraf
 influxdb_ssl_ca_cert="INFLUXDB_SSL_CA_CERT"
 if [ -f $ENV_DIR/$influxdb_ssl_ca_cert ]; then
     echo "Found certificate for InfluxDB SSL CA" | indent
-    mkdir -p $BUILD_DIR/.telegraf/etc
-    cp $ENV_DIR/$influxdb_ssl_ca_cert $BUILD_DIR/.telegraf/etc/influxdb_ssl_ca_cert.pem
+    mkdir -p $BUILD_DIR/.scalingo/telegraf/etc
+    cp $ENV_DIR/$influxdb_ssl_ca_cert $BUILD_DIR/.scalingo/telegraf/etc/influxdb_ssl_ca_cert.pem
 else
     echo "No certificate found"
 fi

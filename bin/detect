@@ -1,4 +1,12 @@
 #!/bin/sh
 
-echo "Telegraf"
-exit 0
+echo "Telegraf buildpack"
+
+BUILD_DIR=$1
+
+if [ -f $BUILD_DIR/telegraf.conf ]; then
+    echo "Found telegraf.conf"
+    exit 0
+else
+    exit 1
+fi

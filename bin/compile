@@ -41,23 +41,30 @@ tar -C $CACHE_DIR -zxf $CACHE_DIR/$TELEGRAF_FILENAME
 mkdir -p $BUILD_DIR/bin
 cp $CACHE_DIR/telegraf/usr/bin/telegraf $BUILD_DIR/bin/telegraf
 
+# Copy the ssl certificate if exists
 influxdb_ssl_ca_cert="INFLUXDB_SSL_CA_CERT"
+
 if [ -f $ENV_DIR/$influxdb_ssl_ca_cert ]; then
     echo "Found certificate for InfluxDB SSL CA" | indent
-    mkdir -p $BUILD_DIR/.scalingo/telegraf/etc
-    cp $ENV_DIR/$influxdb_ssl_ca_cert $BUILD_DIR/.scalingo/telegraf/etc/influxdb_ssl_ca_cert.pem
+    mkdir -p $BUILD_DIR/telegraf/etc
+    cp $ENV_DIR/$influxdb_ssl_ca_cert $BUILD_DIR/telegraf/etc/influxdb_ssl_ca_cert.pem
 else
     echo "No certificate found"
 fi
 
+# Create a .profile.d folder
 if [ ! -d $BUILD_DIR/.profile.d ]; then
     mkdir -p "$BUILD_DIR/.profile.d"
 fi
 
+# Create the startup script to launch the telegraf agent
 cat > $BUILD_DIR/.profile.d/001-heroku-buildpack-telegraf.sh << EOF
 #!/bin/sh
 
 echo "Starting Telegraf service"
+
+printenv
+
 pidfile=/tmp/telegraf.pid
 
 # Start Telegraf from the \$HOME/bin directory with the configuration in /app/telegraf.conf (by default), redirect STDIN to /dev/null (but STDERR should still come through the logs)

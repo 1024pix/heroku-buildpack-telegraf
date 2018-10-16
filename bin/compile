@@ -48,6 +48,11 @@ if [ -f $ENV_DIR/$influxdb_ssl_ca_cert ]; then
     echo "Found certificate for InfluxDB SSL CA" | indent
     mkdir -p $BUILD_DIR/telegraf/etc
     cp $ENV_DIR/$influxdb_ssl_ca_cert $BUILD_DIR/telegraf/etc/influxdb_ssl_ca_cert.pem
+
+    # Replace \n by a return line in pem file
+    sed -i 's/\\n/\
+/g' $BUILD_DIR/telegraf/etc/influxdb_ssl_ca_cert.pem
+
 else
     echo "No certificate found"
 fi
